@@ -1,0 +1,11 @@
+SchemeLexer sl = new SchemeLexer(new ByteArrayInputStream(source.getBytes()));
+SchemeParser sp = new SchemeParser(sl);
+List<Entry> entrys = sp.program();
+for (Entry e : entrys) {
+   ASTRewriter astr = new ASTRewriter();
+   Element exp = astr.toSchemeList(e);
+   Element result = Interpreter.eval(exp, env);
+   if(! (result instanceof EmptyResult)) {
+     System.out.println(result);
+  } 
+}

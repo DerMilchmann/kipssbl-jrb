@@ -1,0 +1,7 @@
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\obj\Debug\SBL.csproj.AssemblyReference.cache
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\obj\Debug\SBL.csproj.CoreCompileInputs.cache
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\bin\Debug\SBL.exe.config
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\bin\Debug\SBL.exe
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\bin\Debug\SBL.pdb
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\obj\Debug\SBL.exe
+F:\Studium\2021 SS\Konzepte in Programmiersprachen\C#\kipssbl\SBL\obj\Debug\SBL.pdb
