@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 public class Procedure
 {
-    SchemeEnvironment localEnv;
-
+    protected SchemeEnvironment localEnv;
 
     SchemeList procParams;
-    public SchemeList Params
+    protected SchemeList Params
     {
         get { return procParams; }
     }
@@ -16,6 +15,8 @@ public class Procedure
 
     public Procedure(SchemeList procParams, ExpressionElement body, SchemeEnvironment curEnv)
     {
+        Eval = EvalProcBase;
+
         localEnv = new SchemeEnvironment(curEnv);
         this.procParams = procParams;
         this.body = body;
@@ -23,25 +24,24 @@ public class Procedure
             localEnv.UpdateVar(procParams[i].Text, procParams[i]);
     }
 
-    public Element Eval(SchemeList paramsl, SchemeEnvironment env)
+    public delegate Element EvalDel(SchemeList paramsl, SchemeEnvironment env);
+    public EvalDel Eval;
+    Element EvalProcBase(SchemeList paramsl, SchemeEnvironment env)
     {
-        SchemeEnvironment paramBind = new SchemeEnvironment(localEnv);
-        if(paramsl.Count - 1 < procParams.Count)
+        if(paramsl.Count < procParams.Count)
             throw new ArgumentException("Not enough Arguments. Expecting " + procParams.Count + 
                 " but received " + procParams.Count + ".");
 
         //Bind Params
         for (int i = 0; i < procParams.Count; i++)
-            paramBind.UpdateVar(paramsl[i].Text, paramsl.NextIt());
+            localEnv.UpdateVar(Params[i].Text, paramsl.NextIt());
 
 
         if(paramsl.NextIt() != null)
             throw new ArgumentException("Too many Arguments. Expecting "+ procParams.Count +
                 " but received " + procParams.Count + ".");
 
-        localEnv.Parent = env;
-        Element result = Interpreter.Eval(new SchemeList(body), paramBind);
-        localEnv.Parent = null;
+        Element result = Interpreter.Eval(new SchemeList(body), localEnv);
 
         return result;
     }

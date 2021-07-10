@@ -17,9 +17,6 @@ static class Interpreter
                 case nameof(BoolElement):
                     return nextElement;
                 case nameof(OperatorElement):
-                    Element a = Eval(sl, env);
-                    Element b = Eval(sl, env);
-                    return Operate(nextElement, a, b);
                 case nameof(TokenElement):
                     return EvaluateToken(nextElement as TokenElement, sl, env);
                 case nameof(ExpressionElement):
@@ -55,6 +52,69 @@ static class Interpreter
         return new EmptyElement();
     }
 
+
+    static Element EvaluateToken(TokenElement token, SchemeList sl, SchemeEnvironment env)
+    {
+        Element ret = new EmptyElement();
+
+        switch(token.Text)
+        {
+            case "define":
+                Element lookahead = sl.NextIt();
+                if(lookahead is ExpressionElement)
+                {
+                    //Prozedur
+                    SchemeList header = (lookahead as ExpressionElement).exprList;
+                    ExpressionElement body = sl.NextIt() as ExpressionElement;
+
+                    createProcedur(header, body, env);
+
+                }else
+                {
+                    //Variable
+                    string id = lookahead.Text;
+                    Element Value = Eval(sl, env);
+                    env.UpdateVar(id, Value);
+                }
+                return ret;
+
+            //Variable Eval
+            case string _ when env.ContainsVar(token.Text):
+                return Eval(new SchemeList(env.GetVar(token.Text)), env);
+
+            //Procedure Eval
+            case string _ when env.ContainsProc(token.Text):
+                Procedure proc = env.GetProc(token.Text);
+
+                SchemeList parameters = new SchemeList();
+
+                Element nextParam;
+                while((nextParam = sl.NextIt()) != null)
+                {
+                    parameters.Append(nextParam);
+                }
+                
+                return proc.Eval(parameters, env);
+
+            default:
+                    throw new Exception("Identifier not in Environment: " + token.Text);
+        }
+    }
+
+    static void createProcedur(SchemeList header, ExpressionElement body, SchemeEnvironment env)
+    {
+        //Process Header
+        Element id = header.NextIt();
+        SchemeList parameters = new SchemeList();
+        Element p;
+        while ((p = header.NextIt()) != null)
+            parameters.Append(p);
+
+        Procedure neu = new Procedure(parameters, body, env);
+
+        env.UpdateProc(id.Text, neu);
+    }
+
     static Element Operate(Element op, Element a, Element b)
     {
         //op = + - / * = > < 
@@ -80,7 +140,7 @@ static class Interpreter
                     ret = new NumberElement((ad / bd).ToString());
                     break;
                 case ("="):
-                    ret = new BoolElement(Equals(ad,bd).ToString());
+                    ret = new BoolElement(Equals(ad, bd).ToString());
                     break;
                 case ("<"):
                     ret = new BoolElement((ad < bd).ToString());
@@ -94,71 +154,5 @@ static class Interpreter
                                     + a.GetType().Name + " and "
                                     + b.GetType().Name + " instead.");
         return ret;
-    }
-
-    static Element EvaluateToken(TokenElement token, SchemeList sl, SchemeEnvironment env)
-    {
-        Element ret = new EmptyElement();
-
-        switch(token.Text)
-        {
-            case "define":
-                Element lookahead = sl.NextIt();
-                if(lookahead is ExpressionElement)
-                {
-                    //Prozedur mit Head und Body erstellen
-                    //weil ein ExpressionElement bedeutet es gibt die Form define (head args) body
-                    SchemeList header = (lookahead as ExpressionElement).exprList;
-                    ExpressionElement body = sl.NextIt() as ExpressionElement;
-
-                    //Process Header
-                    Element id = header.NextIt();
-                    SchemeList parameters = new SchemeList();
-                    Element p;
-                    while ((p = header.NextIt()) != null)
-                        parameters.Append(p);
-
-                    Procedure neu = new Procedure(parameters, body, env);
-
-                    env.UpdateProc(id.Text,neu);
-
-                }else
-                {
-                    //Variable
-                    string id = lookahead.Text;
-                    Element Value = Eval(sl, env);
-                    env.UpdateVar(id, Value);
-                }
-                return ret;
-
-            //Variable
-            case string _ when env.ContainsVar(token.Text):
-                return Eval(new SchemeList(env.GetVar(token.Text)), env);
-
-            //Procedure
-            case string _ when env.ContainsProc(token.Text):
-                Procedure proc = env.GetProc(token.Text);
-                if (proc.Params.Count != (sl.Count() - 1))
-                    throw new Exception("Parameter count not matching Procedure. Expecting " + proc.Params.Count + ", but received " + sl.Count());
-
-                //Dont update EnvAtCreation
-                SchemeEnvironment paramEnv = proc.Env.DeepCopy();
-                {
-                    Element p;
-                    int i = 0;
-                    while ((p = sl.Next()) != null)
-                    {
-                        paramEnv.UpdateVar(proc.Params[i].Text, p);
-                        i++;
-                    }
-                }
-                //ACHTUNG PROC BODY WIRD KONSUMIERT WEIL SCHEMELIST DIRTY IMPLEMENTIERT
-                return Eval(new SchemeList(proc.Body), paramEnv);
-
-            default:
-                    throw new Exception("Identifier not in Environment.");
-        }
-
-
     }
 }

@@ -57,7 +57,7 @@ class TokenElement : Element
     public TokenElement(string text) : base(text) { }
 }
 
-class OperatorElement : Element
+class OperatorElement : TokenElement
 {
     public OperatorElement(string text) : base(text) { }
 }

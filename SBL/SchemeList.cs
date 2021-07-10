@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class SchemeList 
 {
-    List<Element> list;
+    protected List<Element> list;
     int it = 0;
 
     public SchemeList()
@@ -54,6 +54,12 @@ public class SchemeList
         }         
     }
 
+    public SchemeList Copy()
+    {
+        SchemeList neu = new SchemeList();
+        neu.list = list;
+        return neu;
+    }
     public int Count
     {
         get { return list.Count; }

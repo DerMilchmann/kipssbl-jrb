@@ -13,7 +13,7 @@ namespace Lambda
 
             SchemeEnvironment global = new SchemeEnvironment(null);
             InitGlobalEnv(global);
-            env = ReadFile();
+            SchemeEnvironment env = ReadFile(global);
 
             //Read single lines with operations
             StreamReader s = new StreamReader(Console.OpenStandardInput());
@@ -22,7 +22,7 @@ namespace Lambda
                 string input = s.ReadLine();              
 
                 if (input == "reload")
-                    env = ReadFile();
+                    env = ReadFile(global);
                 else
                 {
                     //Convert to Stream
@@ -51,7 +51,7 @@ namespace Lambda
         }
 
 
-        static SchemeEnvironment ReadFile()
+        static SchemeEnvironment ReadFile(SchemeEnvironment global)
         {
             using (FileStream stream = File.OpenRead("../../SchemeCode.rkt"))
             {
@@ -60,7 +60,7 @@ namespace Lambda
                 SchemeLexer sl = new SchemeLexer(stream);
                 SchemeParser sp = new SchemeParser(sl);
                 List<Entry> entrys = sp.Parse();
-                var env = new SchemeEnvironment(null);
+                var env = new SchemeEnvironment(global);
 
                 foreach (Entry e in entrys)
                 {
@@ -79,12 +79,12 @@ namespace Lambda
 
         static void InitGlobalEnv(SchemeEnvironment global)
         {
-            // + Operation
+            // ++++++++++
             {
                 string id = "+";
                 SchemeList procParams = new SchemeList();
-                procParams.Append(new TokenElement("a"));
-                procParams.Append(new TokenElement("b"));
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
 
                 Func<Element, Element, Element> body = (a, b) => 
                 {
@@ -105,6 +105,174 @@ namespace Lambda
                 OperationProcedur plus = new OperationProcedur(procParams, body, global);
 
                 global.UpdateProc(id, plus);
+            }
+
+            // ----------
+            {
+                string id = "-";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    NumberElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new NumberElement((ad - bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur minus = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, minus);
+            }
+
+            // //////////
+            {
+                string id = "/";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    NumberElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new NumberElement((ad / bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur divide = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, divide);
+            }
+
+            // **********
+            {
+                string id = "*";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    NumberElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new NumberElement((ad * bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur multiplication = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, multiplication);
+            }
+
+            // ==========
+            {
+                string id = "=";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    BoolElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new BoolElement(Equals(ad, bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur equals = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, equals);
+            }
+
+            // <<<<<<<<<<
+            {
+                string id = "<";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    BoolElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new BoolElement((ad < bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur smaller = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, smaller);
+            }
+
+            // >>>>>>>>>>
+            {
+                string id = ">";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    BoolElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new BoolElement((ad > bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur greater = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, greater);
             }
         }
     }
