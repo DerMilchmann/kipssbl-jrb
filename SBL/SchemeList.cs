@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public class SchemeList
 {
     protected List<Element> list;
-    int it = 0;
+    int position = 0;
 
     public SchemeList()
     {
         list = new List<Element>();
     }
-    public SchemeList(Element e) : base()
+    public SchemeList(Element e)
     {
         list = new List<Element>();
         list.Add(e);
     }
+
     public void Append(Element e)
     {
         list.Add(e);
@@ -27,23 +29,29 @@ public class SchemeList
 
     public Element this[int i] => list[i];
 
-    public Element NextIt()
+    public Element Next()
     {
-        if (list.Count == it)
+        if (list.Count == position)
         {
-            it = 0;
+            position = 0;
             return null;
         }          
         else
         {
-            Element ret = list[it];
-            it++;
+            Element ret = list[position];
+            position++;
             return ret;
         }         
     }
-
     public int Count
     {
         get { return list.Count; }
+    }
+
+    public SchemeList Copy()
+    {
+        SchemeList ret = new SchemeList();
+        ret.list = list;
+        return ret;
     }
 }

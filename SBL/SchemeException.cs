@@ -34,3 +34,11 @@ class ParserException : SchemeException
         type = "ParserException";
     }
 }
+
+class BadSyntaxException : SchemeException
+{
+    public BadSyntaxException(string text) : base(text)
+    {
+        type = "BadSyntaxException";
+    }
+}

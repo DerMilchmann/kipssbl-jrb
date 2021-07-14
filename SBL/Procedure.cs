@@ -29,11 +29,16 @@ public class Procedure
                 " but received " + procParams.Count + ".");
 
         //Bind Params
+        //for (int i = 0; i < procParams.Count; i++)
+        //    localEnv.UpdateVar(Params[i].Text, paramsl.NextIt());
         for (int i = 0; i < procParams.Count; i++)
-            localEnv.UpdateVar(Params[i].Text, paramsl.NextIt());
+        {
+            Element update = Interpreter.Eval((paramsl.Next() as ExpressionElement).ExprList, env);
+            localEnv.UpdateVar(Params[i].Text, update);
+        }
+            
 
-
-        if(paramsl.NextIt() != null)
+        if (paramsl.Next() != null)
             throw new ParameterMismatch("Too many Arguments. Expecting "+ procParams.Count +
                 " but received " + procParams.Count + ".");
 

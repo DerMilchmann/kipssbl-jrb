@@ -16,6 +16,23 @@ public class Element
     public string Text { get => text;
         set => this.text = value; }
 }
+
+public class ExpressionElement : Element
+{
+    protected SchemeList exprList;
+    public SchemeList ExprList
+    { get { return exprList.Copy(); } }
+    public ExpressionElement(SchemeList list) : base()
+    {
+        exprList = list;
+    }
+
+    public ExpressionElement(string text) : base(text)
+    {
+        exprList = new SchemeList();
+    }
+}
+
 class NumberElement : ExpressionElement
 {
     public double Value
@@ -52,28 +69,16 @@ class StringElement : ExpressionElement
     }
 }
 
-class TokenElement : Element
+class TokenElement : ExpressionElement
 {
-    public TokenElement(string text) : base(text) { }
+    public TokenElement(string text) : base(text) {
+        exprList.Append(this);
+    }
 }
 
 class OperatorElement : TokenElement
 {
     public OperatorElement(string text) : base(text) { }
-}
-
-public class ExpressionElement : Element
-{
-    public SchemeList exprList;
-    public ExpressionElement(SchemeList list) : base() 
-    {
-        exprList = list;
-    }
-
-    public ExpressionElement(string text) : base(text)
-    {
-        exprList = new SchemeList();
-    }
 }
 
 class EmptyElement : Element

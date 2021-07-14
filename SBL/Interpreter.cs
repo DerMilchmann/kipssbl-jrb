@@ -6,7 +6,7 @@ static class Interpreter
     static public Element Eval(SchemeList sl,  SchemeEnvironment env)
     {
         Element nextElement = null;
-        while((nextElement = sl.NextIt()) != null)
+        while((nextElement = sl.Next()) != null)
         {
             switch (nextElement.GetType().Name)
             {
@@ -20,35 +20,11 @@ static class Interpreter
                 case nameof(TokenElement):
                     return EvaluateToken(nextElement as TokenElement, sl, env);
                 case nameof(ExpressionElement):
-                    return Eval((nextElement as ExpressionElement).exprList, env);
+                    return Eval((nextElement as ExpressionElement).ExprList, env);
                 case nameof(EmptyElement):
                     break;
             }
         }
-        /*for(int i = 0; i < sl.Count();i++)
-        {
-            nextElement = sl[i];
-
-            switch (nextElement.GetType().Name)
-            {
-                case nameof(NumberElement):
-                    return nextElement;
-                case nameof(StringElement):
-                    return nextElement;
-                case nameof(BoolElement):
-                    return nextElement;
-                case nameof(OperatorElement):
-                    Element a = Eval(sl, env);
-                    Element b = Eval(sl, env);
-                    return Operate(nextElement, a, b);
-                case nameof(TokenElement):
-                    return EvaluateToken(nextElement as TokenElement, sl, env);
-                case nameof(ExpressionElement):
-                    return Eval((nextElement as ExpressionElement).exprList, env);
-                case nameof(EmptyElement):
-                    break;
-            }
-        }*/
         return new EmptyElement();
     }
 
@@ -60,22 +36,74 @@ static class Interpreter
         switch(token.Text)
         {
             case "define":
-                Element lookahead = sl.NextIt();
-                if(lookahead is ExpressionElement)
-                {
-                    //Prozedur
-                    SchemeList header = (lookahead as ExpressionElement).exprList;
-                    ExpressionElement body = sl.NextIt() as ExpressionElement;
-
-                    createProcedur(header, body, env);
-
-                }else
+                Element lookahead = sl.Next();
+                if (lookahead == null)
+                    throw new BadSyntaxException("Bad Syntax in define");
+                if(lookahead is TokenElement)
                 {
                     //Variable
                     string id = lookahead.Text;
                     Element Value = Eval(sl, env);
                     env.UpdateVar(id, Value);
                 }
+                else
+                {
+                    //Prozedur
+                    SchemeList header = (lookahead as ExpressionElement).ExprList;
+                    ExpressionElement body = sl.Next() as ExpressionElement;
+
+                    createProcedur(header, body, env);
+                }
+                return ret;
+
+            case "lambda":
+                {
+                    /* lambda
+                     * (arg-id)
+                     * body
+                     */
+                    ExpressionElement arguments = sl.Next() as ExpressionElement;
+                    ExpressionElement body = sl.Next() as ExpressionElement;
+                    if (sl.Next() != null ||
+                        arguments == null ||
+                        body == null)
+                        throw new BadSyntaxException("Bad Syntax in Lambda");
+
+                    //should return a procedure pointer
+                    //no idea how to do that with my current implementation
+                    //I'd have to re-design alot to accomodate for procedure pointers
+
+                    Procedure lambda = new Procedure(arguments.ExprList, body, env);
+
+                    return ret;
+                }
+
+
+            case "if":
+                ExpressionElement testExpr = sl.Next() as ExpressionElement;
+                ExpressionElement thenExpr = sl.Next() as ExpressionElement;
+                ExpressionElement elseExpr = sl.Next() as ExpressionElement;
+                if (sl.Next() != null ||
+                    testExpr == null ||
+                    thenExpr == null ||
+                    elseExpr == null)
+                    throw new BadSyntaxException("Bad Syntax in IF");
+              
+                if (Eval(testExpr.ExprList, env).Text != "#f")//ANY value other than #f --> then-expr               
+                    ret = Eval(thenExpr.ExprList, env);
+                else
+                    ret = Eval(elseExpr.ExprList, env);
+
+                return ret;
+
+            case "cond":
+
+                Element condClause = sl.Next();
+                if (condClause == null)
+                    return ret; // #void
+
+
+
                 return ret;
 
             //Variable Eval
@@ -89,7 +117,7 @@ static class Interpreter
                 SchemeList parameters = new SchemeList();
 
                 Element nextParam;
-                while((nextParam = sl.NextIt()) != null)
+                while((nextParam = sl.Next()) != null)
                 {
                     parameters.Append(nextParam);
                 }
@@ -104,10 +132,10 @@ static class Interpreter
     static void createProcedur(SchemeList header, ExpressionElement body, SchemeEnvironment env)
     {
         //Process Header
-        Element id = header.NextIt();
+        Element id = header.Next();
         SchemeList parameters = new SchemeList();
         Element p;
-        while ((p = header.NextIt()) != null)
+        while ((p = header.Next()) != null)
             parameters.Append(p);
 
         Procedure neu = new Procedure(parameters, body, env);

@@ -294,6 +294,60 @@ namespace Lambda
 
                 global.UpdateProc(id, greater);
             }
+            // >=>=>=>=>=>=
+            {
+                string id = ">=";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    BoolElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new BoolElement((ad >= bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur greaterEqual = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, greaterEqual);
+            }
+            // <=<=<=<=<=<=
+            {
+                string id = "<=";
+                SchemeList procParams = new SchemeList();
+                procParams.Append(new TokenElement(""));
+                procParams.Append(new TokenElement(""));
+
+                Func<Element, Element, Element> body = (a, b) =>
+                {
+                    BoolElement ret = null;
+                    if (a is NumberElement && b is NumberElement)
+                    {
+                        double ad = (a as NumberElement).Value;
+                        double bd = (b as NumberElement).Value;
+                        ret = new BoolElement((ad <= bd).ToString());
+
+                    }
+                    else throw new InvalidOperationException("Expecting two NumberElements, got "
+                                                + a.GetType().Name + " and "
+                                                + b.GetType().Name + " instead.");
+                    return ret;
+                };
+
+                OperationProcedur smallerEqual = new OperationProcedur(procParams, body, global);
+
+                global.UpdateProc(id, smallerEqual);
+            }
         }
     }
 }

@@ -21,10 +21,10 @@ public class OperationProcedur : Procedure
         //localEnv der Operation ist global
         //da kann man nichts finden...
         //übergeben der Aufrufs env
-        Element a = Interpreter.Eval(new SchemeList(paramsl.NextIt()), env);
-        Element b = Interpreter.Eval(new SchemeList(paramsl.NextIt()), env);
+        Element a = Interpreter.Eval(new SchemeList(paramsl.Next()), env);
+        Element b = Interpreter.Eval(new SchemeList(paramsl.Next()), env);
 
-        if (paramsl.NextIt() != null)
+        if (paramsl.Next() != null)
             throw new ParameterMismatch("Too many arguments for Operation, expecting 2, but received " +
                 Params.Count+".");
 
