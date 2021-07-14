@@ -70,7 +70,7 @@ public class SchemeParser : Parser
                 quoted();
                 break;
             default:
-                throw new InvalidOperationException("SchemeParser: no valid element; read" + lookahead);
+                throw new ParserException("No valid element; reading " + lookahead);
 
         }
         if (lookahead.getType() == SchemeLexer.LPARENTHESIS)
@@ -145,7 +145,7 @@ public class SchemeParser : Parser
             case SchemeLexer.EOF:
                 break;
             default:
-                throw new InvalidOperationException("SchemeParser: invalid form; read " + lookahead);
+                throw new ParserException("Invalid form; reading " + lookahead);
         }
     }
 }

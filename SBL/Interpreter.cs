@@ -97,7 +97,7 @@ static class Interpreter
                 return proc.Eval(parameters, env);
 
             default:
-                    throw new Exception("Identifier not in Environment: " + token.Text);
+                    throw new UndefinedIdentifier("Identifier not in Environment: " + token.Text);
         }
     }
 

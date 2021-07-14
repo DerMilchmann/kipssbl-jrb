@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="OperationProcedur.cs" />
     <Compile Include="Procedure.cs" />
+    <Compile Include="SchemeException.cs" />
     <Compile Include="Tree\ASTreeWriter.cs" />
     <Compile Include="ASTRewriter.cs" />
     <Compile Include="Element.cs" />

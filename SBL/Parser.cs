@@ -28,7 +28,7 @@ public class Parser
         {
             Consume();
         }
-        else throw new InvalidOperationException("parsing error: expecting " + input.getTokenName(type)
+        else throw new ParserException("Expecting " + input.getTokenName(type)
                                         + "; found " + lookahead);
     }
 }

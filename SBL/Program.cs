@@ -6,14 +6,15 @@ namespace Lambda
 {
     class Program
     {
+        static SchemeEnvironment global;
         static void Main(string[] args)
         {
             if (!File.Exists("../../SchemeCode.rkt"))
                 throw new IOException("File SchemeCode.rkt does not exist in this directory.\n");
 
-            SchemeEnvironment global = new SchemeEnvironment(null);
-            InitGlobalEnv(global);
-            SchemeEnvironment env = ReadFile(global);
+
+            InitGlobalEnv();
+            SchemeEnvironment env = ReadFile();
 
             //Read single lines with operations
             StreamReader s = new StreamReader(Console.OpenStandardInput());
@@ -22,63 +23,82 @@ namespace Lambda
                 string input = s.ReadLine();              
 
                 if (input == "reload")
-                    env = ReadFile(global);
+                    env = ReadFile();
                 else
                 {
-                    //Convert to Stream
-                    var stream = new MemoryStream();
-                    var writer = new StreamWriter(stream);
-                    writer.Write(input);
-                    writer.Flush();
-                    stream.Position = 0;
+                    var stream = ConvertInputToStream(input);
 
-                    //Start with stream
-                    SchemeLexer sl = new SchemeLexer(stream);
-                    SchemeParser sp = new SchemeParser(sl);
-                    List<Entry> entrys = sp.Parse();
-                    foreach (Entry e in entrys)
-                    {
-                        ASTRewriter astr = new ASTRewriter();
-                        SchemeList exp = astr.toSchemeList(e);
-                        Element result = Interpreter.Eval(exp, env);
-                        if ((result.Text != null))
-                        {
-                            Console.WriteLine(result.Text);
-                        }
-                    }
+                    LineInput(stream, env);
                 }
             }
         }
 
+        static Stream ConvertInputToStream(string input)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(input);
+            writer.Flush();
+            stream.Position = 0;
 
-        static SchemeEnvironment ReadFile(SchemeEnvironment global)
+            return stream;
+        }
+
+        static void LineInput(Stream stream, SchemeEnvironment env)
+        {
+            try
+            {
+                SchemeLexer sl = new SchemeLexer(stream);
+                SchemeParser sp = new SchemeParser(sl);
+                List<Entry> entrys = sp.Parse();
+                foreach (Entry e in entrys)
+                {
+                    ASTRewriter astr = new ASTRewriter();
+                    SchemeList exp = astr.toSchemeList(e);
+                    Element result = Interpreter.Eval(exp, env);
+                    if ((result.Text != null))
+                    {
+                        Console.WriteLine(result.Text);
+                    }
+                }
+            } catch (SchemeException se) { se.Display(); }
+        }
+
+        static SchemeEnvironment ReadFile()
         {
             using (FileStream stream = File.OpenRead("../../SchemeCode.rkt"))
             {
                 stream.Position = 0;
 
-                SchemeLexer sl = new SchemeLexer(stream);
-                SchemeParser sp = new SchemeParser(sl);
-                List<Entry> entrys = sp.Parse();
                 var env = new SchemeEnvironment(global);
 
-                foreach (Entry e in entrys)
+                try
                 {
+                    SchemeLexer sl = new SchemeLexer(stream);
+                    SchemeParser sp = new SchemeParser(sl);
+                    List<Entry> entrys = sp.Parse();
 
-                    ASTRewriter astr = new ASTRewriter();
-                    SchemeList exp = astr.toSchemeList(e);
-                    Element result = Interpreter.Eval(exp, env);
-                    if (!(result is EmptyElement))
+
+                    foreach (Entry e in entrys)
                     {
-                        Console.WriteLine(result.Text);
+
+                        ASTRewriter astr = new ASTRewriter();
+                        SchemeList exp = astr.toSchemeList(e);
+                        Element result = Interpreter.Eval(exp, env);
+                        if (!(result is EmptyElement))
+                        {
+                            Console.WriteLine(result.Text);
+                        }
                     }
-                }
+                }catch (SchemeException se) { se.Display(); }
+
                 return env;
             }
         }
 
-        static void InitGlobalEnv(SchemeEnvironment global)
+        static void InitGlobalEnv()
         {
+            global = new SchemeEnvironment(null);
             // ++++++++++
             {
                 string id = "+";

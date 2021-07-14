@@ -15,8 +15,6 @@ public class Procedure
 
     public Procedure(SchemeList procParams, ExpressionElement body, SchemeEnvironment curEnv)
     {
-        Eval = EvalProcBase;
-
         localEnv = new SchemeEnvironment(curEnv);
         this.procParams = procParams;
         this.body = body;
@@ -24,12 +22,10 @@ public class Procedure
             localEnv.UpdateVar(procParams[i].Text, procParams[i]);
     }
 
-    public delegate Element EvalDel(SchemeList paramsl, SchemeEnvironment env);
-    public EvalDel Eval;
-    Element EvalProcBase(SchemeList paramsl, SchemeEnvironment env)
+    public virtual Element Eval(SchemeList paramsl, SchemeEnvironment env)
     {
         if(paramsl.Count < procParams.Count)
-            throw new ArgumentException("Not enough Arguments. Expecting " + procParams.Count + 
+            throw new ParameterMismatch("Not enough Arguments. Expecting " + procParams.Count + 
                 " but received " + procParams.Count + ".");
 
         //Bind Params
@@ -38,7 +34,7 @@ public class Procedure
 
 
         if(paramsl.NextIt() != null)
-            throw new ArgumentException("Too many Arguments. Expecting "+ procParams.Count +
+            throw new ParameterMismatch("Too many Arguments. Expecting "+ procParams.Count +
                 " but received " + procParams.Count + ".");
 
         Element result = Interpreter.Eval(new SchemeList(body), localEnv);

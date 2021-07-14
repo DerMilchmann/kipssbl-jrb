@@ -76,7 +76,7 @@ public class SchemeLexer : Lexer
             do {
                 sb.Append(c);
                 consume();
-            } while (!eof && Char.IsDigit(c));
+            } while (!eof && char.IsDigit(c));
         }catch(Exception e)
         {
             Console.Write(e.StackTrace);

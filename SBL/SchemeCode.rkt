@@ -8,4 +8,4 @@
 
 (define (summe x y) (+ x y))
 
-(summe a a)
+(summe a b)
