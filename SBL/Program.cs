@@ -7,12 +7,8 @@ class Program
     static SchemeEnvironment global;
     static void Main(string[] args)
     {
-        if (!File.Exists("../../SchemeCode/SchemeCode.rkt"))
-            throw new IOException("File SchemeCode.rkt does not exist in this directory.\n");
-
-
         InitGlobalEnv();
-        SchemeEnvironment env = ReadFile();
+        SchemeEnvironment env = ReadFile(global);
 
         //Read single lines with operations
         StreamReader s = new StreamReader(Console.OpenStandardInput());
@@ -23,8 +19,11 @@ class Program
             if (input == "reload")
             {
                 Console.Clear();
-                env = ReadFile(); 
-            }               
+                env = ReadFile(global);
+            }else if(input.Contains("load"))
+            {
+                env = ReadFile(env,input.Substring(5));
+            }
             else
             {
                 var stream = ConvertInputToStream(input);
@@ -66,13 +65,16 @@ class Program
         catch (SchemeException se) { se.Display(); }
     }
 
-    static SchemeEnvironment ReadFile()
+    static SchemeEnvironment ReadFile(SchemeEnvironment parent, string filename = "SchemeCode.rkt")
     {
-        using (FileStream stream = File.OpenRead("../../SchemeCode/SchemeCode.rkt"))
+        if (!File.Exists("../../SchemeCode/"+ filename))
+            throw new IOException("File "+filename+" does not exist in this directory.\n");
+
+        using (FileStream stream = File.OpenRead("../../SchemeCode/"+filename))
         {
             stream.Position = 0;
 
-            var env = new SchemeEnvironment(global);
+            var env = new SchemeEnvironment(parent);
 
             try
             {
