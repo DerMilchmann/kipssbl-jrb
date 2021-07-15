@@ -78,7 +78,8 @@ static class Interpreter
         "lambda",
         "if",
         "cond",
-        "let"
+        "let",
+        "set!"
     };
     static Element EvaluateToken(TokenElement token, SchemeList sl, SchemeEnvironment env)
     {
@@ -118,12 +119,16 @@ static class Interpreter
                      * (arg-id)
                      * body
                      */
+
+                    
                     ExpressionElement arguments = sl.Next() as ExpressionElement;
                     Element body = sl.Next();
                     if (sl.Next() != null ||
                         arguments == null ||
                         body == null)
                         throw new BadSyntaxException("Bad Syntax in Lambda.");
+                    
+
 
                     //should return a procedure pointer
                     //no idea how to do that with my current implementation
@@ -208,6 +213,17 @@ static class Interpreter
                     }
 
                     return Eval(body, letEnv);
+                }
+
+            case "set!":
+                {
+                    //(set! <variable> <expression>)
+                    TokenElement variable = sl.Next() as TokenElement;
+                    Element expression = sl.Next();
+
+                    env.Update(variable.Text, Eval(expression, env));
+
+                    return ret;
                 }
 
             //Search Environment for definition
