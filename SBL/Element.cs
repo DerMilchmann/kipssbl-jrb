@@ -33,18 +33,18 @@ public class ExpressionElement : Element
     }
 }
 
-class NumberElement : ExpressionElement
+class NumberElement : Element
 {
     public double Value
     {
         get { return double.Parse(Text); }
     }
     public NumberElement(string text) : base(text) {
-        exprList.Append(this);
+        
     }
 }
 
-class BoolElement : ExpressionElement
+class BoolElement : Element
 {
     public bool Value
     {
@@ -58,24 +58,30 @@ class BoolElement : ExpressionElement
                 Text = "#t";
             else
                 Text = "#f";
-        exprList.Append(this);
+        
     }
 }
 
-class StringElement : ExpressionElement
+class StringElement : Element
 {
     public StringElement(string text) : base(text){
-        exprList.Append(this);
+       
     }
 }
 
-class TokenElement : ExpressionElement
+class TokenElement : Element
 {
     public TokenElement(string text) : base(text) {
-        exprList.Append(this);
+        
     }
 }
 
+class ProcedureElement : Element
+{
+    public Procedure proc;
+    public ProcedureElement(Procedure proc, string text) : base("#<procedure:"+text+">") { this.proc = proc; }
+    public ProcedureElement(Procedure proc) : base("#<procedure>") { this.proc = proc; }
+}
 class OperatorElement : TokenElement
 {
     public OperatorElement(string text) : base(text) { }

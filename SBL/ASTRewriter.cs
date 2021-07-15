@@ -14,7 +14,8 @@
     public SchemeList toSchemeList(Entry ast)
     {
         if (ast != null)
-        {
+        {           
+            //toSchemeList erzeugt keine Expression bei der ersten Klammerung
             Entry e = null;
             Element neu = null;
             SchemeList save = current;
@@ -59,6 +60,7 @@
                     if (neu != null)
                     {
                         current.Append(neu);
+                        return null;
                     }
                 }
             }
@@ -78,9 +80,10 @@
                 {
                     sl = current;
                 }
-
             }
         }
-        return sl;
+        SchemeList ret = new SchemeList();
+        ret.Append(sl);
+        return ret;
     }
 }

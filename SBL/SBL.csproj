@@ -81,7 +81,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="SchemeCode.rkt" />
+    <None Include="SchemeCode\abstraction.scm" />
+    <None Include="SchemeCode\closure.scm" />
+    <None Include="SchemeCode\curry.scm" />
+    <None Include="SchemeCode\let.scm" />
+    <None Include="SchemeCode\liste.scm" />
+    <None Include="SchemeCode\mergesort.scm" />
+    <None Include="SchemeCode\recursion.scm" />
+    <None Include="SchemeCode\SchemeCode.rkt" />
+    <None Include="SchemeCode\simple.scm" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Java\" />

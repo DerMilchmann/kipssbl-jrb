@@ -11,38 +11,38 @@ public class Procedure
         get { return procParams; }
     }
 
-    ExpressionElement body;
+    Element body;
 
-    public Procedure(SchemeList procParams, ExpressionElement body, SchemeEnvironment curEnv)
+    public Procedure(SchemeList procParams, Element body, SchemeEnvironment curEnv)
     {
         localEnv = new SchemeEnvironment(curEnv);
         this.procParams = procParams;
         this.body = body;
         for(int i = 0; i < procParams.Count;i++)
-            localEnv.UpdateVar(procParams[i].Text, procParams[i]);
+            localEnv.Update(procParams[i].Text, procParams[i]);
     }
 
     public virtual Element Eval(SchemeList paramsl, SchemeEnvironment env)
     {
+        //Enough Arguments?
         if(paramsl.Count < procParams.Count)
             throw new ParameterMismatch("Not enough Arguments. Expecting " + procParams.Count + 
                 " but received " + procParams.Count + ".");
 
         //Bind Params
-        //for (int i = 0; i < procParams.Count; i++)
-        //    localEnv.UpdateVar(Params[i].Text, paramsl.NextIt());
         for (int i = 0; i < procParams.Count; i++)
         {
-            Element update = Interpreter.Eval((paramsl.Next() as ExpressionElement).ExprList, env);
-            localEnv.UpdateVar(Params[i].Text, update);
+            Element update = Interpreter.Eval(paramsl.Next(), env);
+            localEnv.Update(Params[i].Text, update);
         }
             
-
+        //Too many Arguments?
         if (paramsl.Next() != null)
             throw new ParameterMismatch("Too many Arguments. Expecting "+ procParams.Count +
                 " but received " + procParams.Count + ".");
 
-        Element result = Interpreter.Eval(new SchemeList(body), localEnv);
+
+        Element result = Interpreter.Eval(body, localEnv);
 
         return result;
     }

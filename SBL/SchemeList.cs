@@ -47,7 +47,10 @@ public class SchemeList
     {
         get { return list.Count; }
     }
-
+    public void Reset()
+    {
+        position = 0;
+    }
     public SchemeList Copy()
     {
         SchemeList ret = new SchemeList();

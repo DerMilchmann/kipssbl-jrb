@@ -42,3 +42,11 @@ class BadSyntaxException : SchemeException
         type = "BadSyntaxException";
     }
 }
+
+class NotAProcedureException : SchemeException
+{
+    public NotAProcedureException(string text) : base(text)
+    {
+        type = "NotAProcedure";
+    }
+}

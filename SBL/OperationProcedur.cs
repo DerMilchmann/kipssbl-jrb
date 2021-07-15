@@ -3,32 +3,26 @@ using System.Collections.Generic;
 
 public class OperationProcedur : Procedure
 {
-    Func<ExpressionElement, ExpressionElement,Element> EvalOp;
+    Func<Element, Element, Element> EvalOp;
 
-    public OperationProcedur(SchemeList procParams, Func<ExpressionElement, ExpressionElement, Element> func, SchemeEnvironment env) : base(procParams,null,env) 
+    public OperationProcedur(SchemeList procParams, Func<Element, Element, Element> func, SchemeEnvironment env) : base(procParams,null,env) 
     {
         EvalOp = func;
     }
 
     public override Element Eval(SchemeList paramsl, SchemeEnvironment env)
     {
-        if (paramsl.Count < Params.Count)
-            throw new ParameterMismatch("Not enough Arguments. Expecting 2, but received " + 
-                Params.Count + ".");
+        if (paramsl.Count == 0)
+            return new NumberElement("0");
 
-        Element result = null;
+        Element result = Interpreter.Eval(paramsl.Next(), env);
+        Element b;
 
-        //localEnv der Operation ist global
-        //da kann man nichts finden...
-        //übergeben der Aufrufs env
-        Element a = Interpreter.Eval(new SchemeList(paramsl.Next()), env);
-        Element b = Interpreter.Eval(new SchemeList(paramsl.Next()), env);
-
-        if (paramsl.Next() != null)
-            throw new ParameterMismatch("Too many arguments for Operation, expecting 2, but received " +
-                Params.Count+".");
-
-        result = EvalOp(a as ExpressionElement, b as ExpressionElement);
+        while((b = paramsl.Next()) != null)
+        {
+            b = Interpreter.Eval(b, env);
+            result = EvalOp(result, b);
+        }
 
         return result;
     }
