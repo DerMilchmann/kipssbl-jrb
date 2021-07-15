@@ -11,9 +11,9 @@ public class Procedure
         get { return procParams; }
     }
 
-    Element body;
+    SchemeList body;
 
-    public Procedure(SchemeList procParams, Element body, SchemeEnvironment curEnv)
+    public Procedure(SchemeList procParams, SchemeList body, SchemeEnvironment curEnv)
     {
         localEnv = new SchemeEnvironment(curEnv);
         this.procParams = procParams;
@@ -41,8 +41,12 @@ public class Procedure
             throw new ParameterMismatch("Too many Arguments. Expecting "+ procParams.Count +
                 " but received " + procParams.Count + ".");
 
-
-        Element result = Interpreter.Eval(body, localEnv);
+        Element result = new EmptyElement();
+        
+        for(int i = 0; i < body.Count; i++)
+        {
+            result = Interpreter.Eval(body[i], localEnv);
+        }      
 
         return result;
     }

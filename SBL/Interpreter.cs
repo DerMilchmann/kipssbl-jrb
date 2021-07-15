@@ -102,7 +102,10 @@ static class Interpreter
                 {
                     //Prozedur
                     SchemeList header = (lookahead as ExpressionElement).ExprList;
-                    Element body = sl.Next();
+                    SchemeList body = new SchemeList();
+                    Element b;
+                    while ((b = sl.Next()) != null)
+                        body.Append(b);
 
                     Procedure neu = createProcedur(header, body, env);
 
@@ -120,15 +123,26 @@ static class Interpreter
                      * body
                      */
 
-                    
+                    /*alt und heile
                     ExpressionElement arguments = sl.Next() as ExpressionElement;
                     Element body = sl.Next();
                     if (sl.Next() != null ||
                         arguments == null ||
                         body == null)
                         throw new BadSyntaxException("Bad Syntax in Lambda.");
-                    
+                    */
+                    //Neu für set
+                    //mehr als eine Anweisung im Body
+                    //Letzte wird returned
+                    ExpressionElement arguments = sl.Next() as ExpressionElement;
+                    SchemeList body = new SchemeList();
+                    Element b;
+                    while ((b = sl.Next()) != null)
+                        body.Append(b);
 
+                    if (arguments == null ||
+                        body.Count == 0)
+                        throw new BadSyntaxException("Bad Syntax in Lambda.");
 
                     //should return a procedure pointer
                     //no idea how to do that with my current implementation
@@ -235,7 +249,7 @@ static class Interpreter
         }
     }
 
-    static Procedure createProcedur(SchemeList header, Element body, SchemeEnvironment env)
+    static Procedure createProcedur(SchemeList header, SchemeList body, SchemeEnvironment env)
     {
         //Process Header
         Element id = header.Next();
