@@ -73,10 +73,6 @@ public class SchemeParser : Parser
                 throw new ParserException("No valid element; reading " + lookahead);
 
         }
-        if (lookahead.getType() == SchemeLexer.LPARENTHESIS)
-        {
-            liste();
-        }
     }
 
     public void elements()
