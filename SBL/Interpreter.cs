@@ -52,7 +52,7 @@ static class Interpreter
                 first = EvaluateToken(first as TokenElement, sl, env);
 
         if (first is ExpressionElement)
-            first = Eval((first as ExpressionElement).ExprList, env);
+            first = Call((first as ExpressionElement).ExprList, env);
 
         if (!(first is ProcedureElement))
             throw new NotAProcedureException("Expected a procedure that can be applied to arguments.");
@@ -123,17 +123,6 @@ static class Interpreter
                      * body
                      */
 
-                    /*alt und heile
-                    ExpressionElement arguments = sl.Next() as ExpressionElement;
-                    Element body = sl.Next();
-                    if (sl.Next() != null ||
-                        arguments == null ||
-                        body == null)
-                        throw new BadSyntaxException("Bad Syntax in Lambda.");
-                    */
-                    //Neu für set
-                    //mehr als eine Anweisung im Body
-                    //Letzte wird returned
                     ExpressionElement arguments = sl.Next() as ExpressionElement;
                     SchemeList body = new SchemeList();
                     Element b;
@@ -143,10 +132,6 @@ static class Interpreter
                     if (arguments == null ||
                         body.Count == 0)
                         throw new BadSyntaxException("Bad Syntax in Lambda.");
-
-                    //should return a procedure pointer
-                    //no idea how to do that with my current implementation
-                    //I'd have to re-design alot to accomodate for procedure pointers
 
                     //Jesus gib mir Kraft
 
