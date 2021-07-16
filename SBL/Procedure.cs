@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-public class Procedure
+﻿public class Procedure
 {
     protected SchemeEnvironment localEnv;
 
